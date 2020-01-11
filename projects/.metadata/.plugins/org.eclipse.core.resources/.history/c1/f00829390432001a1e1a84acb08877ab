@@ -1,0 +1,11 @@
+package user;
+
+public class User {
+	private String userID;
+	private String userPassword;
+	private String userGander;
+	private String userName;
+	private String userEmail;
+	
+
+}

@@ -1,0 +1,47 @@
+package user;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+public class UserDAO {
+	
+	private Connection conn;
+	private PreparedStatement pstmt; //sql 인젝션해킹방지하기위해서 이용 
+	private ResultSet rs; //실행한결과를 담을수잇는 필드
+	
+	public UserDAO() {
+		try {
+			String dbURL ="jdbc:mysql://localhost:3306/BBS?characterEncoding=UTF-8&serverTimezone=UTC"; //우리컴퓨터에 설치된 마이에스큐엘 서버 자체의 bbs서버로
+			String dbID = "root"; //루트계정접속
+			String dbPassword = "qwer134";//루트계정 비밀번호
+			Class.forName("com.mysql.cj.jdbc.Driver");//mysql 드라이버 찾기
+			conn = DriverManager.getConnection(dbURL, dbID, dbPassword); 
+			}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}//mysql 접속하기
+
+	public int login(String userID, String userPassword) {
+		String SQL= "SELECT userPassword FROM USER WHERE userID = ?"; //패스워드가져오기 
+		try {
+			pstmt= conn.prepareStatement(SQL);//SQL물불러와서
+			pstmt.setString(1, userID);//매개변수로 들어온(1)을 ?에 해당하는 내용으로 넣어줌 즉 userID= 매개변수 같은효과로 쿼리검색
+			rs = pstmt.executeQuery();
+			if(rs.next()) {//next 실행결과가 있으면 true반환
+				if(rs.getString(1).equals(userPassword))//쿼리에의한 결과물즉 비번이 매개변수로온 비번과 일치하면 통과 (즉 1반환) 
+					return 1;//로그인성공
+				else
+					return 0; //비번 불일치
+					
+			}
+			return -1; //아이디가없다 
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return -2;//디비오류
+	}
+	
+	
+}
